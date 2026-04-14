@@ -36,9 +36,21 @@ export function compareCards(input: CompareInput): CompareResult {
   // Determine which competitors to compare
   let competitors: CreditCard[];
   if (input.competitor_card_ids && input.competitor_card_ids.length > 0) {
+    const unknownIds = input.competitor_card_ids.filter((id) => !getCardById(id));
     competitors = input.competitor_card_ids
       .map((id) => getCardById(id))
       .filter((c): c is CreditCard => c !== undefined);
+    if (unknownIds.length > 0 && competitors.length > 0) {
+      // Will include warning in verdict
+      (competitors as CreditCard[] & { _unknownIds?: string[] })._unknownIds = unknownIds;
+    }
+    if (unknownIds.length > 0 && competitors.length === 0) {
+      return {
+        cards: [{ id: bwCard.id, name: bwCard.name, issuer: bwCard.issuer }],
+        dimensions: [],
+        verdict: `No valid competitor cards found. Unknown IDs: ${unknownIds.join(", ")}. Available IDs can be retrieved via get_product_info.`,
+      };
+    }
   } else {
     // Default: compare to Capital One (best APR), Aspire (best rewards), OpenSky (secured baseline)
     competitors = [

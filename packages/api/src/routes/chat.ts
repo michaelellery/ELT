@@ -17,7 +17,8 @@ const chatRequestSchema = z.object({
 chatRouter.post("/chat", async (c) => {
   let body: unknown;
   try {
-    body = await c.req.json();
+    // Prefer pre-parsed body from rate limiter middleware (avoids double-consume on Lambda streaming)
+    body = c.get("parsedBody" as never) ?? (await c.req.json());
   } catch {
     return c.json({ error: "Invalid JSON body" }, 400);
   }

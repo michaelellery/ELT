@@ -21,11 +21,14 @@ export function resetRateLimit(sessionId: string): void {
 export const rateLimiter: MiddlewareHandler = async (c, next) => {
   let sessionId: string | undefined;
 
-  // Try to read sessionId from body
+  // Clone the request body so downstream handlers can still read it
   try {
-    const body = await c.req.json() as Record<string, unknown>;
+    const clonedBody = await c.req.text();
+    const body = JSON.parse(clonedBody) as Record<string, unknown>;
     sessionId = typeof body.sessionId === "string" ? body.sessionId : undefined;
+    // Store for downstream reuse (avoids double-consume on streaming Lambda)
     c.set("parsedBody" as never, body);
+    c.set("rawBody" as never, clonedBody);
   } catch {
     // No body or invalid JSON — let pass through to validation
   }
