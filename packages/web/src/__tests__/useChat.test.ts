@@ -1,7 +1,7 @@
 // packages/web/src/__tests__/useChat.test.ts
 // Tests for useChat hook — ELT-12
 
-import { describe, it, expect, vi, beforeEach } from "vitest";
+import { describe, it, expect } from "vitest";
 import { renderHook, act } from "@testing-library/react";
 
 // TODO (Dev 1): Import actual hook when ELT-9 is complete
@@ -150,8 +150,6 @@ describe("useChat hook", () => {
   describe("Streaming state", () => {
     it("sets isStreaming to true while processing", async () => {
       const { result } = renderHook(() => useChat());
-      const streamingStates: boolean[] = [];
-
       // Note: with the inline hook, we can only observe final state
       // TODO: Test actual streaming behavior when Dev 1 implements SSE parsing
       await act(async () => {

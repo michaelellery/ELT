@@ -1,7 +1,7 @@
 // packages/web/src/__tests__/ChatContainer.test.tsx
 // Tests for ChatContainer component — ELT-12
 
-import { describe, it, expect, vi } from "vitest";
+import { describe, it, expect } from "vitest";
 import { render, screen } from "@testing-library/react";
 
 // TODO (Dev 1): Import actual component when ELT-9 is complete
