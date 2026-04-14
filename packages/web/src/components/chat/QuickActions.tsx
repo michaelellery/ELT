@@ -35,8 +35,8 @@ export function QuickActions({
           onClick={() => onSelect(action.message)}
           className={clsx(
             "flex items-center gap-1.5 px-3 py-2 rounded-full text-sm font-medium whitespace-nowrap shrink-0",
-            "border border-[--omf-blue] text-[--omf-blue]",
-            "bg-white dark:bg-[--dm-bg-surface] dark:text-[--omf-blue-light] dark:border-[--omf-blue-light]",
+            "border-2 border-[--omf-blue] text-[--omf-blue]",
+            "bg-blue-50 dark:bg-slate-700 dark:text-[--omf-blue-light] dark:border-[--omf-blue-light]",
             "transition-all duration-150",
             "hover:bg-[--omf-blue] hover:text-white dark:hover:bg-[--omf-blue] dark:hover:text-white",
             "active:scale-95",
