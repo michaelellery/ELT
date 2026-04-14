@@ -28,6 +28,9 @@ export default $config({
       timeout: "120 seconds",
       memory: "512 MB",
       link: [anthropicKey],
+      environment: {
+        ANTHROPIC_API_KEY: anthropicKey.value,
+      },
     });
 
     // Frontend static site — React + Vite, deployed to S3 + CloudFront
