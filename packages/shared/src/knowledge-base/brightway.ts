@@ -1,6 +1,3 @@
-// packages/shared/src/knowledge-base/brightway.ts
-// BrightWay product data — as of April 2026
-
 import type { CreditCard } from "../types/products.js";
 
 export const BRIGHTWAY_CARDS: CreditCard[] = [
@@ -10,27 +7,51 @@ export const BRIGHTWAY_CARDS: CreditCard[] = [
     issuer: "OneMain Financial",
     network: "Mastercard",
     targetMarket: "subprime",
-    apr: { regular: 35.99, type: "fixed", floor: 19.99 },
-    annualFee: { min: 0, max: 89, waivable: false },
-    cashBack: { enabled: true, baseRate: 1.0 },
-    creditLimit: { startingMin: 300, startingMax: 1500, eventualMax: 15000 },
+    apr: {
+      regular: 35.99,
+      type: "fixed",
+      floor: 19.99,
+    },
+    annualFee: {
+      min: 0,
+      max: 89,
+      waivable: false,
+      note: "Fee amount varies by offer; typically $0, $49, $75, or $89",
+    },
+    cashBack: {
+      enabled: true,
+      baseRate: 1.0,
+      note: "1% unlimited cash back on all purchases",
+    },
+    creditLimit: {
+      startingMin: 300,
+      startingMax: 1500,
+      eventualMax: 15000,
+    },
     fees: {
       foreignTransaction: 1.0,
-      cashAdvance: "Greater of $10 or 3%",
       latePayment: "Up to $40",
+      cashAdvance: "See card agreement",
     },
     features: [
       "No security deposit required",
-      "Reports to all 3 credit bureaus",
-      "Milestone reward system",
+      "Reports to all 3 credit bureaus (Equifax, Experian, TransUnion)",
+      "Milestone reward system — reduce APR or increase credit limit",
       "Mastercard global acceptance",
-      "Invite-only — no application required",
+      "Upgrade path to BrightWay+ after 4 Milestones",
+      "Low 1% foreign transaction fee (vs industry standard 3%)",
     ],
     milestones: {
       paymentsPerMilestone: 6,
       rewards: [
-        { type: "apr_decrease", description: "Reduce your APR (floor: 19.99%)" },
-        { type: "credit_limit_increase", description: "Increase your credit limit (ceiling: $15,000)" },
+        {
+          type: "apr_decrease",
+          description: "Reduce your APR (floor: 19.99%)",
+        },
+        {
+          type: "credit_limit_increase",
+          description: "Increase your credit limit (ceiling: $15,000)",
+        },
       ],
       graduationMilestones: 4,
       graduationCard: "BrightWay+",
@@ -50,27 +71,51 @@ export const BRIGHTWAY_CARDS: CreditCard[] = [
     issuer: "OneMain Financial",
     network: "Mastercard",
     targetMarket: "near-prime",
-    apr: { regular: 29.99, type: "fixed", floor: 19.99 },
-    annualFee: { min: 0, max: 49, waivable: false },
-    cashBack: { enabled: true, baseRate: 1.5 },
-    creditLimit: { startingMin: 500, startingMax: 3000, eventualMax: 15000 },
+    apr: {
+      regular: 35.99,
+      type: "fixed",
+      floor: 19.99,
+    },
+    annualFee: {
+      min: 0,
+      max: 89,
+      waivable: false,
+      note: "Fee amount varies by offer",
+    },
+    cashBack: {
+      enabled: true,
+      baseRate: 1.5,
+      note: "1.5% unlimited cash back on all purchases (up to $3,000 credit limit)",
+    },
+    creditLimit: {
+      startingMin: 300,
+      startingMax: 3000,
+      eventualMax: 15000,
+    },
     fees: {
       foreignTransaction: 1.0,
-      cashAdvance: "Greater of $10 or 3%",
       latePayment: "Up to $40",
+      cashAdvance: "See card agreement",
     },
     features: [
-      "1.5% cash back on all purchases",
+      "1.5% cash back — highest rate in the BrightWay family",
       "No security deposit required",
       "Reports to all 3 credit bureaus",
       "Milestone reward system",
-      "Mastercard global acceptance",
+      "Up to $3,000 starting credit limit",
+      "Low 1% foreign transaction fee",
     ],
     milestones: {
       paymentsPerMilestone: 6,
       rewards: [
-        { type: "apr_decrease", description: "Reduce your APR (floor: 19.99%)" },
-        { type: "credit_limit_increase", description: "Increase your credit limit" },
+        {
+          type: "apr_decrease",
+          description: "Reduce your APR (floor: 19.99%)",
+        },
+        {
+          type: "credit_limit_increase",
+          description: "Increase your credit limit (ceiling: $15,000)",
+        },
       ],
       graduationMilestones: 4,
       graduationCard: "BrightWay+",
@@ -90,22 +135,57 @@ export const BRIGHTWAY_CARDS: CreditCard[] = [
     issuer: "OneMain Financial",
     network: "Mastercard",
     targetMarket: "near-prime",
-    apr: { regular: 24.99, type: "fixed" },
-    annualFee: { min: 0, max: 0, waivable: false },
-    cashBack: { enabled: true, baseRate: 1.0 },
-    creditLimit: { startingMin: 1000, startingMax: 3000, eventualMax: 15000 },
+    apr: {
+      regular: 35.99,
+      type: "fixed",
+      floor: 19.99,
+    },
+    annualFee: {
+      min: 0,
+      max: 0,
+      waivable: false,
+      note: "$0 annual fee — the graduation reward for completing 4 BrightWay Milestones",
+    },
+    cashBack: {
+      enabled: true,
+      baseRate: 1.0,
+      note: "1% unlimited cash back on all purchases",
+    },
+    creditLimit: {
+      startingMin: 300,
+      startingMax: 3000,
+      eventualMax: 15000,
+    },
     fees: {
       foreignTransaction: 1.0,
-      cashAdvance: "Greater of $10 or 3%",
       latePayment: "Up to $40",
+      cashAdvance: "See card agreement",
     },
     features: [
-      "$0 annual fee",
-      "Graduation product from BrightWay after 4 milestones",
-      "1% cash back on all purchases",
+      "$0 annual fee — earned through Milestone graduation",
+      "No security deposit required",
       "Reports to all 3 credit bureaus",
-      "Mastercard global acceptance",
+      "Continued Milestone rewards available",
+      "Up to $3,000 starting credit limit",
+      "Low 1% foreign transaction fee",
+      "Reward for responsible card use",
     ],
+    milestones: {
+      paymentsPerMilestone: 6,
+      rewards: [
+        {
+          type: "apr_decrease",
+          description: "Reduce your APR (floor: 19.99%)",
+        },
+        {
+          type: "credit_limit_increase",
+          description: "Increase your credit limit (ceiling: $15,000)",
+        },
+      ],
+      graduationMilestones: 4,
+      graduationCard: "BrightWay+",
+      forfeitOnLatePayment: true,
+    },
     bureauReporting: ["Equifax", "Experian", "TransUnion"],
     secured: false,
     depositRequired: false,

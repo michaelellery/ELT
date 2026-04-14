@@ -8,7 +8,7 @@ describe("GET /hello", () => {
     expect(res.status).toBe(200);
     const body = await res.json() as { message: string; timestamp: string; version: string };
     expect(body.message).toBe("Hello from ELT!");
-    expect(body.version).toBe("1.0.0");
+    expect(body.version).toBe("2.0.0");
     expect(body.timestamp).toMatch(/^\d{4}-\d{2}-\d{2}T/);
   });
 });

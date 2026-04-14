@@ -10,7 +10,10 @@
     "test": "vitest run"
   },
   "dependencies": {
-    "hono": "^4.7.5"
+    "@anthropic-ai/sdk": "^0.39.0",
+    "@elt/shared": "workspace:*",
+    "hono": "^4.7.5",
+    "zod": "^3.23.0"
   },
   "devDependencies": {
     "@types/node": "^22.0.0",

@@ -1,12 +1,29 @@
-// packages/shared/src/types/chat.ts
-// Chat message and session types
-
 export interface ChatMessage {
-  id?: string;
   role: "user" | "assistant";
-  content: string;
-  toolResults?: ToolResultEvent[];
-  timestamp?: number;
+  content: string | ContentBlock[];
+}
+
+export type ContentBlock =
+  | TextBlock
+  | ToolUseBlock
+  | ToolResultBlock;
+
+export interface TextBlock {
+  type: "text";
+  text: string;
+}
+
+export interface ToolUseBlock {
+  type: "tool_use";
+  id: string;
+  name: string;
+  input: Record<string, unknown>;
+}
+
+export interface ToolResultBlock {
+  type: "tool_result";
+  tool_use_id: string;
+  content: string | { type: "text"; text: string }[];
 }
 
 export interface ChatRequest {
@@ -14,39 +31,44 @@ export interface ChatRequest {
   message: string;
 }
 
-export interface StreamEvent {
-  type: "text" | "tool_call" | "tool_result" | "done" | "error";
+export interface Session {
+  messages: ChatMessage[];
+  createdAt: number;
+  lastAccessedAt: number;
 }
 
-export interface TextEvent extends StreamEvent {
+// SSE Event Types
+export type StreamEventType = "text" | "tool_call" | "tool_result" | "done" | "error";
+
+export interface TextStreamEvent {
   type: "text";
   text: string;
 }
 
-export interface ToolCallEvent extends StreamEvent {
+export interface ToolCallStreamEvent {
   type: "tool_call";
   name: string;
   input: Record<string, unknown>;
 }
 
-export interface ToolResultEvent extends StreamEvent {
+export interface ToolResultStreamEvent {
   type: "tool_result";
   name: string;
   result: unknown;
 }
 
-export interface DoneEvent extends StreamEvent {
+export interface DoneStreamEvent {
   type: "done";
 }
 
-export interface ErrorEvent extends StreamEvent {
+export interface ErrorStreamEvent {
   type: "error";
   message: string;
 }
 
-export type AnyStreamEvent =
-  | TextEvent
-  | ToolCallEvent
-  | ToolResultEvent
-  | DoneEvent
-  | ErrorEvent;
+export type StreamEvent =
+  | TextStreamEvent
+  | ToolCallStreamEvent
+  | ToolResultStreamEvent
+  | DoneStreamEvent
+  | ErrorStreamEvent;
