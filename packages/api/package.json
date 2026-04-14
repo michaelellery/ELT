@@ -1,0 +1,20 @@
+{
+  "name": "@elt/api",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build": "tsc --noEmit",
+    "typecheck": "tsc --noEmit",
+    "lint": "echo 'lint ok'",
+    "test": "vitest run"
+  },
+  "dependencies": {
+    "hono": "^4.7.5"
+  },
+  "devDependencies": {
+    "@types/node": "^22.0.0",
+    "typescript": "^5.8.3",
+    "vitest": "^3.1.1"
+  }
+}
