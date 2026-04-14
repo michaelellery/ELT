@@ -2,7 +2,7 @@
  * API Client — fetch + SSE streaming for /api/chat
  */
 
-const API_URL = import.meta.env.VITE_API_URL ?? "";
+const API_URL = (import.meta.env.VITE_API_URL ?? "").replace(/\/+$/, "");
 
 export interface StreamEvent {
   type: "text" | "tool_call" | "tool_result" | "done" | "error";

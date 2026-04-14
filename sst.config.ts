@@ -22,7 +22,7 @@ export default $config({
       handler: "packages/api/src/index.handler",
       runtime: "nodejs22.x",
       url: {
-        cors: true,
+        cors: false,
         streaming: true,
       },
       timeout: "120 seconds",
