@@ -35,10 +35,10 @@ export function QuickActions({
           onClick={() => onSelect(action.message)}
           className={clsx(
             "flex items-center gap-1.5 px-3 py-2 rounded-full text-sm font-medium whitespace-nowrap shrink-0",
-            "border-2 border-[--omf-blue] text-white font-semibold",
-            "bg-[--omf-blue] dark:bg-[--omf-blue] dark:text-white dark:border-[--omf-blue-light]",
+            "border-2 border-blue-700 text-white font-semibold",
+            "bg-blue-700 dark:bg-blue-600 dark:text-white dark:border-blue-500",
             "transition-all duration-150 shadow-sm",
-            "hover:bg-[--omf-navy] hover:border-[--omf-navy] hover:text-white dark:hover:bg-[--omf-navy] dark:hover:text-white",
+            "hover:bg-blue-900 hover:border-blue-900 hover:text-white dark:hover:bg-blue-800 dark:hover:text-white",
             "active:scale-95",
             "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[--omf-blue] focus-visible:ring-offset-1",
             "disabled:opacity-40 disabled:cursor-not-allowed",
