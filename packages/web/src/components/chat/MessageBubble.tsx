@@ -82,9 +82,9 @@ export const MessageBubble = memo(function MessageBubble({
               isUser
                 ? { backgroundColor: "var(--chat-user-bg)" }
                 : {
-                    backgroundColor: "var(--chat-bot-bg)",
-                    border: "1px solid var(--border-color)",
-                    color: "var(--text-primary)",
+                    backgroundColor: "var(--chat-bot-bg, #ffffff)",
+                    border: "1px solid var(--border-color, #e5e7eb)",
+                    color: "#1a1a1a",
                   }
             }
           >
