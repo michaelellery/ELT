@@ -6,12 +6,25 @@ const config: Config = {
   theme: {
     extend: {
       colors: {
-        "omf-navy": "#003366",
-        "omf-blue": "#0066CC",
-        "omf-light-blue": "#E8F4FD",
-        "omf-green": "#00A651",
-        "omf-amber": "#F5A623",
-        "omf-red": "#D0021B",
+        "omf-navy": "#1A2744",
+        "omf-blue": "#0057A8",
+        "omf-blue-light": "#1A7FD4",
+        "brightway-teal": "#00B4B4",
+        "brightway-gold": "#F5A623",
+        success: "#059669",
+        warning: "#D97706",
+        error: "#DC2626",
+      },
+      fontFamily: {
+        sans: ["Inter", "-apple-system", "BlinkMacSystemFont", "Segoe UI", "sans-serif"],
+        mono: ["JetBrains Mono", "Fira Code", "monospace"],
+      },
+      borderRadius: {
+        sm: "4px",
+        md: "8px",
+        lg: "12px",
+        xl: "16px",
+        full: "9999px",
       },
     },
   },
