@@ -1,6 +1,3 @@
-// packages/shared/src/types/products.ts
-// CreditCard and related product types
-
 export interface MilestoneReward {
   type: "apr_decrease" | "credit_limit_increase";
   description: string;
@@ -31,11 +28,13 @@ export interface CreditCard {
     min: number;
     max: number;
     waivable: boolean;
+    note?: string;
   };
   cashBack: {
     enabled: boolean;
     baseRate: number;
     categoryRates?: { category: string; rate: number }[];
+    note?: string;
   };
   creditLimit: {
     startingMin: number;
@@ -46,12 +45,14 @@ export interface CreditCard {
     foreignTransaction: number;
     cashAdvance?: string;
     latePayment?: string;
+    monthly?: string;
   };
   features: string[];
   milestones?: MilestoneConfig;
   bureauReporting: ("Equifax" | "Experian" | "TransUnion")[];
   secured: boolean;
   depositRequired: boolean;
+  depositRange?: { min: number; max: number };
   inviteOnly: boolean;
   website?: string;
   phone?: string;

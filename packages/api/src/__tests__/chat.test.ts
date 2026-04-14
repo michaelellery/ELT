@@ -1,10 +1,7 @@
-// packages/api/src/__tests__/chat.test.ts
-// Tests for POST /api/chat — SSE streaming, tool_use loop
-// Dev 3 — ELT-12
-
 import { describe, it, expect, vi, beforeEach } from "vitest";
+import app from "../index.js";
 
-// Mock Anthropic SDK before any imports
+// Mock Anthropic SDK to avoid real API calls
 vi.mock("@anthropic-ai/sdk", () => {
   const mockStream = {
     [Symbol.asyncIterator]: async function* () {
@@ -12,161 +9,228 @@ vi.mock("@anthropic-ai/sdk", () => {
         type: "content_block_delta",
         delta: { type: "text_delta", text: "Hello from BrightWay Assistant!" },
       };
-      yield { type: "message_stop" };
     },
     finalMessage: async () => ({
       id: "msg_test",
       type: "message",
       role: "assistant",
       content: [{ type: "text", text: "Hello from BrightWay Assistant!" }],
-      model: "claude-opus-4-20250514",
       stop_reason: "end_turn",
       stop_sequence: null,
-      usage: { input_tokens: 10, output_tokens: 20 },
-    }),
-  };
-
-  const mockStreamWithToolUse = {
-    [Symbol.asyncIterator]: async function* () {
-      yield {
-        type: "content_block_delta",
-        delta: { type: "text_delta", text: "Let me check that for you..." },
-      };
-      yield { type: "message_stop" };
-    },
-    finalMessage: async () => ({
-      id: "msg_tool",
-      type: "message",
-      role: "assistant",
-      content: [
-        { type: "text", text: "Let me check that for you..." },
-        {
-          type: "tool_use",
-          id: "tool_abc",
-          name: "get_product_info",
-          input: { card_id: "brightway-standard" },
-        },
-      ],
       model: "claude-opus-4-20250514",
-      stop_reason: "tool_use",
-      stop_sequence: null,
-      usage: { input_tokens: 15, output_tokens: 30 },
+      usage: { input_tokens: 10, output_tokens: 10 },
     }),
   };
 
   return {
     default: class MockAnthropic {
       messages = {
-        stream: vi
-          .fn()
-          .mockReturnValueOnce(mockStreamWithToolUse)
-          .mockReturnValue(mockStream),
+        stream: vi.fn().mockReturnValue(mockStream),
       };
     },
   };
 });
 
-describe("Chat Route", () => {
-  describe("POST /api/chat — validation", () => {
-    it("should require sessionId and message", async () => {
-      // Stub test — full route tests need the Hono app instance
-      // TODO: Import app from index.ts when Dev 2 completes ELT-8
-      expect(true).toBe(true);
-    });
+describe("GET /health", () => {
+  it("returns ok status", async () => {
+    const req = new Request("http://localhost/health");
+    const res = await app.fetch(req);
+    expect(res.status).toBe(200);
+    const body = (await res.json()) as { status: string };
+    expect(body.status).toBe("ok");
+  });
+});
 
-    it("should reject empty message", async () => {
-      // TODO: Test that empty message returns 400
-      expect("").toHaveLength(0);
-    });
+describe("GET /api/health", () => {
+  it("returns ok with service info", async () => {
+    const req = new Request("http://localhost/api/health");
+    const res = await app.fetch(req);
+    expect(res.status).toBe(200);
+    const body = (await res.json()) as { status: string; service: string };
+    expect(body.status).toBe("ok");
+    expect(body.service).toBe("elt-api");
+  });
+});
 
-    it("should reject message over 2000 chars", async () => {
-      const longMessage = "a".repeat(2001);
-      expect(longMessage.length).toBeGreaterThan(2000);
-    });
+describe("GET /api/products", () => {
+  it("returns array of all cards", async () => {
+    const req = new Request("http://localhost/api/products");
+    const res = await app.fetch(req);
+    expect(res.status).toBe(200);
+    const body = (await res.json()) as unknown[];
+    expect(Array.isArray(body)).toBe(true);
+    expect(body.length).toBe(11); // 3 BrightWay + 8 competitors
+  });
+});
+
+describe("GET /api/products/:id", () => {
+  it("returns a specific card by ID", async () => {
+    const req = new Request("http://localhost/api/products/brightway-standard");
+    const res = await app.fetch(req);
+    expect(res.status).toBe(200);
+    const body = (await res.json()) as { id: string; name: string };
+    expect(body.id).toBe("brightway-standard");
+    expect(body.name).toBe("BrightWay");
   });
 
-  describe("SSE streaming", () => {
-    it("should return text/event-stream content type", async () => {
-      // TODO: Full integration test with Hono test client
-      // Expected: Content-Type: text/event-stream
-      expect(true).toBe(true);
-    });
+  it("returns 404 for unknown card ID", async () => {
+    const req = new Request("http://localhost/api/products/nonexistent-card");
+    const res = await app.fetch(req);
+    expect(res.status).toBe(404);
+  });
+});
 
-    it("should emit text events for streaming tokens", async () => {
-      // TODO: Parse SSE stream and verify text events
-      const mockEvent = {
-        type: "text",
-        text: "Hello from BrightWay!",
-      };
-      expect(mockEvent.type).toBe("text");
-      expect(mockEvent.text).toBeTruthy();
+describe("POST /api/calculator", () => {
+  it("returns calculation result for valid input", async () => {
+    const req = new Request("http://localhost/api/calculator", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        monthlySpending: 500,
+        annualFee: 49,
+        carriesBalance: false,
+      }),
     });
-
-    it("should emit done event at end of stream", async () => {
-      const doneEvent = { type: "done" };
-      expect(doneEvent.type).toBe("done");
-    });
-
-    it("should emit tool_call event when Claude uses a tool", async () => {
-      const toolCallEvent = {
-        type: "tool_call",
-        name: "get_product_info",
-        input: { card_id: "brightway-standard" },
-      };
-      expect(toolCallEvent.type).toBe("tool_call");
-      expect(toolCallEvent.name).toBe("get_product_info");
-    });
-
-    it("should emit tool_result event after tool execution", async () => {
-      const toolResultEvent = {
-        type: "tool_result",
-        name: "get_product_info",
-        result: { id: "brightway-standard", name: "BrightWay" },
-      };
-      expect(toolResultEvent.type).toBe("tool_result");
-      expect(toolResultEvent.result).toBeDefined();
-    });
+    const res = await app.fetch(req);
+    expect(res.status).toBe(200);
+    const body = (await res.json()) as {
+      annualCashBack: number;
+      netBenefit: number;
+      recommendation: string;
+    };
+    expect(body.annualCashBack).toBe(60);
+    expect(body.netBenefit).toBe(11);
+    expect(["positive", "cautious", "negative"]).toContain(body.recommendation);
   });
 
-  describe("Tool use loop", () => {
-    it("should loop back to Claude after tool results", async () => {
-      // The mock returns tool_use on first call, then end_turn on second
-      // This verifies the loop logic works
-      // Note: @anthropic-ai/sdk is mocked above, using dynamic import to get mock
-      const mockFirstContent = [
-        { type: "text" as const, text: "Let me check that for you..." },
-        { type: "tool_use" as const, id: "tool_abc", name: "get_product_info", input: { card_id: "brightway-standard" } },
-      ];
-      const mockSecondContent = [
-        { type: "text" as const, text: "Hello from BrightWay Assistant!" },
-      ];
-      
-      const hasToolUse = mockFirstContent.some((b) => b.type === "tool_use");
-      expect(hasToolUse).toBe(true);
-      const allNonTool = mockSecondContent.every((b) => b.type === "text");
-      expect(allNonTool).toBe(true);
+  it("returns 400 for invalid input (negative spending)", async () => {
+    const req = new Request("http://localhost/api/calculator", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ monthlySpending: -100 }),
     });
-
-    it("should cap tool loops at 3 iterations", async () => {
-      // Safety test — infinite loops would be bad
-      const MAX_TOOL_LOOPS = 3;
-      expect(MAX_TOOL_LOOPS).toBe(3);
-      // TODO: Test that streaming generator stops after 3 tool loops
-    });
+    const res = await app.fetch(req);
+    expect(res.status).toBe(400);
   });
 
-  describe("Session management", () => {
-    it("should create new session for unknown sessionId", async () => {
-      // TODO: Import session service and test getOrCreateSession
-      const sessionId = crypto.randomUUID();
-      expect(sessionId).toMatch(
-        /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/
-      );
+  it("returns 400 for missing required field", async () => {
+    const req = new Request("http://localhost/api/calculator", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({}),
     });
+    const res = await app.fetch(req);
+    expect(res.status).toBe(400);
+  });
+});
 
-    it("should append messages to existing session", async () => {
-      // TODO: Test session persistence across multiple calls
-      expect(true).toBe(true);
+describe("POST /api/compare", () => {
+  it("returns comparison result for valid input", async () => {
+    const req = new Request("http://localhost/api/compare", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        brightwayCardId: "brightway-standard",
+        competitorIds: ["capital-one-platinum-secured"],
+      }),
     });
+    const res = await app.fetch(req);
+    expect(res.status).toBe(200);
+    const body = (await res.json()) as {
+      cards: unknown[];
+      dimensions: unknown[];
+      verdict: string;
+    };
+    expect(body.cards).toHaveLength(2);
+    expect(body.dimensions.length).toBeGreaterThan(0);
+    expect(body.verdict).toBeDefined();
+  });
+
+  it("returns 200 with empty body (uses defaults)", async () => {
+    const req = new Request("http://localhost/api/compare", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({}),
+    });
+    const res = await app.fetch(req);
+    expect(res.status).toBe(200);
+  });
+});
+
+describe("POST /api/chat", () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+  });
+
+  it("returns 400 for empty message", async () => {
+    const req = new Request("http://localhost/api/chat", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        sessionId: "550e8400-e29b-41d4-a716-446655440000",
+        message: "",
+      }),
+    });
+    const res = await app.fetch(req);
+    expect(res.status).toBe(400);
+  });
+
+  it("returns 400 for message that is too long", async () => {
+    const req = new Request("http://localhost/api/chat", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        sessionId: "550e8400-e29b-41d4-a716-446655440000",
+        message: "x".repeat(2001),
+      }),
+    });
+    const res = await app.fetch(req);
+    expect(res.status).toBe(400);
+  });
+
+  it("returns 400 for PII in message (SSN)", async () => {
+    const req = new Request("http://localhost/api/chat", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        sessionId: "550e8400-e29b-41d4-a716-446655440000",
+        message: "My SSN is 123-45-6789",
+      }),
+    });
+    const res = await app.fetch(req);
+    expect(res.status).toBe(400);
+    const body = (await res.json()) as { error: string };
+    expect(body.error).toBe("pii_detected");
+  });
+
+  it("returns 400 for PII in message (credit card number)", async () => {
+    const req = new Request("http://localhost/api/chat", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        sessionId: "550e8400-e29b-41d4-a716-446655440000",
+        message: "Card: 4111-1111-1111-1111",
+      }),
+    });
+    const res = await app.fetch(req);
+    expect(res.status).toBe(400);
+    const body = (await res.json()) as { error: string };
+    expect(body.error).toBe("pii_detected");
+  });
+
+  it("returns SSE stream for valid message", async () => {
+    const req = new Request("http://localhost/api/chat", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        sessionId: "550e8400-e29b-41d4-a716-446655440001",
+        message: "What is BrightWay?",
+      }),
+    });
+    const res = await app.fetch(req);
+    expect(res.status).toBe(200);
+    // SSE responses use text/event-stream content type
+    const contentType = res.headers.get("Content-Type");
+    expect(contentType).toContain("text/event-stream");
   });
 });

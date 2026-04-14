@@ -1,8 +1,12 @@
 {
   "extends": "../../tsconfig.json",
   "compilerOptions": {
-    "rootDir": "src",
-    "outDir": "dist"
+    "outDir": "dist",
+    "exactOptionalPropertyTypes": false,
+    "paths": {
+      "@elt/shared": ["../shared/src/index.ts"],
+      "@elt/shared/*": ["../shared/src/*"]
+    }
   },
   "include": ["src"]
 }
